@@ -11,7 +11,7 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GRAY = (50, 50, 50)
 LIGHT_GRAY = (150, 150, 150)
-FONT_SIZE = 30
+FONT_SIZE = 24 
 INITIAL_WIDTH = 800
 INITIAL_HEIGHT = 600
 SETTINGS_FILE = "editor_settings.json"
@@ -21,8 +21,8 @@ SETTINGS_FILE = "editor_settings.json"
 def load_settings():
     """Load settings from the JSON file or return defaults."""
     default_settings = {
-        "grid_color": [255, 255, 255], # White
-        "grid_alpha": 127,            # 50% transparency
+        "grid_color": [255, 255, 255], # White (R, G, B)
+        "grid_alpha": 127,            # 50% transparency (0-255)
         "tile_size": 32               # Default tile size in pixels
     }
     if os.path.exists(SETTINGS_FILE):
@@ -41,6 +41,7 @@ def save_settings(settings):
     try:
         with open(SETTINGS_FILE, 'w') as f:
             json.dump(settings, f, indent=4)
+        print("Settings saved successfully.")
     except IOError:
         print("Error saving settings file.")
 
@@ -79,16 +80,43 @@ class TwoDEngine:
         self.clock = pygame.time.Clock()
         self.running = True
         self.font = pygame.font.Font(None, FONT_SIZE)
+        self.color_index = 0 
 
         # Editor State Variables
         self.editor_mode = False
         self.editor_menu_open = False
-        self.settings_menu_open = False # Variable for the Settings menu
+        self.settings_menu_open = False 
 
         # Viewport/Camera variables
-        self.camera_x = 0 # Horizontal offset (panning)
-        self.camera_y = 0 # Vertical offset (panning)
-        self.zoom_level = 1.0 # Zoom level
+        self.camera_x = 0 
+        self.camera_y = 0 
+        self.zoom_level = 1.0
+
+    def handle_settings_input(self, key):
+        """Handle input specific to the settings menu."""
+        
+        # Change Transparency (Alpha)
+        if key == pygame.K_EQUALS or key == pygame.K_KP_PLUS: # Touche '=' ou '+'
+            self.settings['grid_alpha'] = min(255, self.settings['grid_alpha'] + 10)
+            save_settings(self.settings)
+        
+        elif key == pygame.K_MINUS or key == pygame.K_KP_MINUS: # Touche '-'
+            self.settings['grid_alpha'] = max(0, self.settings['grid_alpha'] - 10)
+            save_settings(self.settings)
+
+        # Change Grid Color Component (R, G, B)
+        elif key == pygame.K_r:
+            self.settings['grid_color'][0] = 255 if self.settings['grid_color'][0] == 0 else 0
+            save_settings(self.settings)
+            
+        elif key == pygame.K_g:
+            self.settings['grid_color'][1] = 255 if self.settings['grid_color'][1] == 0 else 0
+            save_settings(self.settings)
+            
+        elif key == pygame.K_b:
+            self.settings['grid_color'][2] = 255 if self.settings['grid_color'][2] == 0 else 0
+            save_settings(self.settings)
+
 
     def run(self):
         """Main loop of the engine."""
@@ -114,24 +142,26 @@ class TwoDEngine:
                     )
                 
                 # Input Handling
-                if event.type == pygame.KEYDOWN:
+                if event.type == pygame.KEYDOWN and self.editor_mode:
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
                     
-                    if self.editor_mode:
-                        # Toggle Editor Menu ('0')
-                        if event.key == pygame.K_0:
-                            self.editor_menu_open = not self.editor_menu_open
-                            self.settings_menu_open = False # Close settings when main menu opens
+                    # Toggle Editor Menu ('0')
+                    if event.key == pygame.K_0:
+                        self.editor_menu_open = not self.editor_menu_open
+                        self.settings_menu_open = False
+                    
+                    # Toggle Settings Menu ('1')
+                    elif event.key == pygame.K_1:
+                        self.settings_menu_open = not self.settings_menu_open
+                        self.editor_menu_open = False
                         
-                        # Toggle Settings Menu ('1')
-                        if event.key == pygame.K_1:
-                            self.settings_menu_open = not self.settings_menu_open
-                            self.editor_menu_open = False # Close main menu when settings opens
+                    # Handle Settings changes only if the settings menu is open
+                    elif self.settings_menu_open:
+                        self.handle_settings_input(event.key)
 
                 # Mouse Wheel Zoom/Dézoom
                 if event.type == pygame.MOUSEBUTTONDOWN and self.editor_mode:
-                    # Zoom In (scroll up: button 4) or Zoom Out (scroll down: button 5)
                     if event.button == 4:
                         self.zoom_level = min(4.0, self.zoom_level * 1.1)
                     if event.button == 5:
@@ -140,7 +170,7 @@ class TwoDEngine:
             # --- Key Held Down for Panning (Déplacement) ---
             if self.editor_mode:
                 keys = pygame.key.get_pressed()
-                pan_speed = 5 / self.zoom_level # Faster movement when zoomed in
+                pan_speed = 5 / self.zoom_level
                 
                 if keys[pygame.K_LEFT]:
                     self.camera_x += pan_speed
@@ -207,8 +237,6 @@ class TwoDEngine:
         self.draw_grid()
         
         # 3. Handle Side Menus
-        
-        # Check if any side menu is open
         if self.editor_menu_open or self.settings_menu_open:
             
             menu_width = 300
@@ -219,54 +247,76 @@ class TwoDEngine:
             pygame.draw.rect(self.screen, GRAY, (menu_x, 0, menu_width, menu_height))
             
             if self.editor_menu_open:
-                # Editor Menu Content (Tiles, etc.)
-                self.draw_menu_content(menu_x, "EDITOR MENU (Tiles, etc.) - Press '0' to close")
+                # Correction: Titre raccourci et y_offset à 30
+                self.draw_menu_content(menu_x, menu_width, "EDITOR MENU ('0' to close)") 
                 
             elif self.settings_menu_open:
-                # Settings Menu Content
-                self.draw_settings_content(menu_x)
+                self.draw_settings_content(menu_x, menu_width)
 
         # 4. Status Text (Always on top)
         status_text = f"Zoom: {self.zoom_level:.2f} | Cam: ({self.camera_x:.0f}, {self.camera_y:.0f}) | T_Size: {self.settings['tile_size']}"
         text_surface = self.font.render(status_text, True, LIGHT_GRAY)
         self.screen.blit(text_surface, (10, 10))
         
-    def draw_menu_content(self, menu_x, title):
-        """Draws generic menu content."""
+    def draw_menu_content(self, menu_x, menu_width, title):
+        """Draws generic menu content, respecting menu width. Corrected Y offset and title size."""
         
-        text_title = self.font.render(title, True, WHITE)
-        self.screen.blit(text_title, (menu_x + 10, 10))
+        padding = 10
+        # Offset initial (30) pour éviter que le texte ne soit coupé par la barre de titre.
+        y_offset = 30 
         
-        text_content = self.font.render("(Area for Tile/Object Selection)", True, WHITE)
-        self.screen.blit(text_content, (menu_x + 10, 50))
+        # Title
+        title_surface = self.font.render(title, True, WHITE)
+        self.screen.blit(title_surface, (menu_x + padding, y_offset))
+        y_offset += title_surface.get_height() + padding
         
-    def draw_settings_content(self, menu_x):
-        """Draws the dedicated Settings menu."""
+        # Placeholder content (Utilise deux lignes si besoin)
+        content_lines = [
+            "(Area for Tile/Object Selection)",
+            "(Soon...)"
+        ]
         
-        title = "SETTINGS MENU (Press '1' to close)"
-        text_title = self.font.render(title, True, WHITE)
-        self.screen.blit(text_title, (menu_x + 10, 10))
+        for line in content_lines:
+            line_surface = self.font.render(line, True, LIGHT_GRAY)
+            self.screen.blit(line_surface, (menu_x + padding, y_offset))
+            y_offset += line_surface.get_height() + 5
         
-        # Display Grid Settings
+    def draw_settings_content(self, menu_x, menu_width):
+        """Draws the dedicated Settings menu with better text positioning. Corrected Y offset and text wrapping."""
+        
+        padding = 10
+        # Offset initial (30) pour éviter que le texte ne soit coupé par la barre de titre.
+        y_offset = 30 
+        
+        # Title (Titre raccourci)
+        title = "SETTINGS MENU ('1' to close)"
+        title_surface = self.font.render(title, True, WHITE)
+        self.screen.blit(title_surface, (menu_x + padding, y_offset))
+        y_offset += title_surface.get_height() + padding * 2 
+
+        # Grid Settings
         current_color = self.settings['grid_color']
         current_alpha = self.settings['grid_alpha']
         
-        info_text = [
-            "",
+        # Utilisation de listes divisées pour simuler le text wrapping
+        info_lines = [
             "--- Grid Settings ---",
             f"Color (R,G,B): {current_color}",
             f"Transparency (0-255): {current_alpha} ({current_alpha/2.55:.0f}%)",
             "",
-            "Functionality coming soon:",
-            "Use + / - to change Transparency",
-            "Use R / G / B to cycle Color"
+            "Controls:",
+            # Lignes divisées pour s'assurer qu'elles rentrent
+            "  '-'/'+'(or'=') to change",
+            "  Transparency (Alpha)",
+            "  'R'/'G'/'B' to toggle Color",
+            "  component"
         ]
         
-        y_offset = 60
-        for line in info_text:
+        # Render and blit each line
+        for line in info_lines:
             line_surface = self.font.render(line, True, LIGHT_GRAY)
-            self.screen.blit(line_surface, (menu_x + 10, y_offset))
-            y_offset += FONT_SIZE + 5
+            self.screen.blit(line_surface, (menu_x + padding, y_offset))
+            y_offset += line_surface.get_height() + 5 
 
 
 # --- Execution ---
