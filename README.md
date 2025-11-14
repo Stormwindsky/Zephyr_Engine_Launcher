@@ -1,4 +1,4 @@
-#✨ TwoD: Open-Source 2D Game Engine
+✨ TwoD: Open-Source 2D Game Engine
 
 TwoD is a robust, open-source 2D game engine designed to empower developers to create a wide variety of games, including classic RPGs and dynamic 2D Platformers.
 
