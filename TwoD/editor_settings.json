@@ -1,5 +1,9 @@
 {
-    "grid_color": [255, 255, 255],
+    "grid_color": [
+        255,
+        255,
+        255
+    ],
     "grid_alpha": 127,
     "tile_size": 32
 }
