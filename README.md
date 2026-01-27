@@ -14,4 +14,3 @@ This project is built upon the following open-source technologies and libraries:
 * **[Python](https://www.python.org/)**: The core programming language. This project utilizes the Python Standard Library for:
     * **JSON**: Used for persistent storage of editor settings.
     * **Math**: Used for complex coordinate calculations and HSV color wheel logic.
-* **[GitHub](https://github.com/)**: For hosting the source code and providing version control.
