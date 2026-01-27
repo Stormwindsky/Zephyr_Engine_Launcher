@@ -8,9 +8,7 @@ Inspired by the accessibility and workflow of engines like RPG Maker, TwoD offer
 
 ## 📜 Credits & Acknowledgments
 
-This project is built upon the following open-source technologies and libraries:
+Here:
 
-* **[Pygame](https://github.com/pygame/pygame)**: A community-driven multimedia library used for rendering the grid, handling UI events, and managing the game loop. Licensed under **LGPL**.
-* **[Python](https://www.python.org/)**: The core programming language. This project utilizes the Python Standard Library for:
-    * **JSON**: Used for persistent storage of editor settings.
-    * **Math**: Used for complex coordinate calculations and HSV color wheel logic.
+https://github.com/Stormwindsky/TwoD/blob/main/NOTICE.md
+
