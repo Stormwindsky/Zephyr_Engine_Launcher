@@ -1,8 +1,30 @@
+# PLEASE NOTE THAT SOME PARTS ARE NOT YET AVAILABLE AS THEY NEED TO BE UPDATED AND THE UPDATE IS CURRENTLY IN PROGRESS.
+
+## 🚀 Zephyr Engine Launcher
+
+Zephyr Engine Launcher is the launcher for running TwoD and ThreeD.
+
+To run it, simply:
+
+source .venv/bin/activate
+
+python3 Zephyr_Engine_Launcher.py
+
 ## ✨ TwoD: Open-Source 2D Game Engine
 
 TwoD is a robust, open-source 2D game engine designed to empower developers to create a wide variety of games, including classic RPGs and dynamic 2D Platformers.
 
 Inspired by the accessibility and workflow of engines like RPG Maker, TwoD offers a flexible and powerful toolkit for non-programmers and seasoned developers alike. Its open-source nature fosters community collaboration, ensuring continuous improvement and a rich library of user-created assets and tools.
+
+To run it, simply:
+
+source .venv/bin/activate
+
+python3 TwoD.py
+
+## ✨ ThreeD: Open-Source 3D Game Engine
+
+# COMING MAYBE... SOON
 
 
 
@@ -12,7 +34,7 @@ Here:
 
 https://github.com/Stormwindsky/TwoD/blob/main/NOTICE.md
 
-## Setup
+## Setup (for Python Script only)
 
 ### ⚠️ PLEASE NOTE THAT THESE INSTRUCTIONS MAY BE THEORETICALLY SIMILAR TO THOSE FOR WINDOWS, BUT SINCE I DO NOT HAVE WINDOWS AND ONLY LINUX, I CANNOT CONFIRM THAT THE COMMANDS TYPED IN WINDOWS ARE 100% THE SAME. ⚠️
 
@@ -74,4 +96,3 @@ This usually happens if:
 "python3-venv is not installed"
 
 If you get an error while creating the venv, run: sudo apt install python3-venv
-
